@@ -11,7 +11,7 @@ I also really like the idea of "vampire attacks" and was thinking about how musi
 I do appreciate that this is not too appropriate for every type of data - you don't want to mint an NFT and store personal identification information onchain that would dox yourself. However, certain classes of data like artist fandom can't really be linked back to an individual on its own so I view this use-case as okay. In addition, many people like to flaunt their fandom of their favorite artists so being on-chain and public can be seen as a benefit.
 
 ## What it does
-FanLink is a project with a couple components. First is the ERC-1155 structure of the FanLink tokens themselves. These are soulbound NFTs, meaning they can't be transferred between addresses and are meant to represent someone's fandom in their favorite artists. Someone would first sign-in to the frontend with their Spotify account - this allows the FE to get an OAuth access token and allow the FE to pull that person's favorite artists and mint those to an NFT. I also added an Update function to allow a fan to periodically add to their FanLink and add to their favorite artists - either by incrementing their old faves or adding new ones.
+FanLink is a project with a couple components. First is the ERC-1155 structure of the FanLink tokens themselves. These are soulbound NFTs, meaning they can't be transferred between addresses (I played WoW and love this name) and are meant to represent someone's fandom in their favorite artists. Someone would first sign-in to the frontend with their Spotify account - this allows the FE to get an OAuth access token and allow the FE to pull that person's favorite artists and mint those to an NFT. I also added an Update function to allow a fan to periodically add to their FanLink and add to their favorite artists - either by incrementing their old faves or adding new ones.
 
 The second part is a set of Chainlinked Artist tools as a separate contract and section in the FE. This is the artist interaction tools that allow them to see their on-chain fans and interact with them in various ways like reimbursing them in ETH for the price of their last concert or airdrop ETH for the ticket price of an upcoming concert. 
 
@@ -22,15 +22,6 @@ I have two Solidity Contracts - one for the artist tools that implements Chainli
 Realistically a couple things need to be added. I was close but didnt finish minting through a Chainlink External Adapter. Right now, anyone can simulate the data array from the Spotify API call and mint to the Solidity contract. They can also mint from a single Spotify Account to multiple wallets. Using a Chainlink EA, you could encrypt the Access token that was posted to the EA call, then decrypt that and make the Spotify API call from the EA. You could also store linkages of Spotify account ID to NFT ID or something similar to ensure 1:1.
 
 I also didn't get a chance to implement VRFv2 which would have been fun but VRFv1 is a bit easier to use IMO.
-
-## Accomplishments that we're proud of
-I hadn't used "payable" contracts before! So I was happy to get my VRF-enabled payable functions to work. I also had a fun moment where I did an amusing "require 1==0" statement to disable all the transferring for my soulbound FanLink token. I also am pretty stoked about the idea of vampire attacking web2.
-
-## What we learned
-I feel like I learned a ton about ERC-1155, the fact that "Soulbound" isn't too much of a defined standard right now, and my frontend skills improved a lot. I hadn't actually used OAuth in practice to actually build anything before, despite troubleshooting a ton of it with developers in my day-job.
-
-## What's next for FanLink
-TBD - it would be excited to get the EA up and running.
 
 
 ## Requirements
