@@ -1,56 +1,56 @@
-# Family-Photo
-For the Chainlink Fall Hackathon 2021.
-# Background
-This project allows a user to create a Family Photo NFT (FAM). A Family Photo is an ERC-721 where each token stores pointers to other ERC-721 NFTs. 
-A user will mint a new FAM which opens it up for that user or other users to "add" their own NFTs to it. "Add" being used loosely here - there isn't any actual token transfer.
-At some point, the minting user can decide to "finalize" the FAM they minted, which will generate an image for that FAM based on all the NFTs added to it. This is done via a custom Chainlink External Adapter currently deployed to Kovan (until my Linkpool node expires) Right now mainly IPFS image URI, URLs, or JSON are supported ways to find that image.
-Then, if a person who added their NFT to a FAM ever moves that NFT from their wallet, the FAM will automatically regenerate a new image with that NFT blacked out (well - darkened out). This is triggered via a Keeper job currently running on Kovan.
+# FanLink
+For the Chainlink Spring Hackathon 2022.
 
-# What
-This project contains Solidity and Python deployment scripts for Family Photo. Currently deployed to Kovan at 0xf7FEB6D989b74c47E0DeB54aC6eFD1aB3412e8cb
+## Inspiration
+As a musician, I am fascinated by the NFT art movement and keenly interested in how NFTs can be used to empower musicians and reduce reliance on the big monopolies of Spotify, Google Music, etc. Apart from NFT use-cases for things like copyright and royalty distribution, I think that how NFTs are a huge way to build communities - as proven by JPEG NFTs over the last year. 
 
-# Setup
-1. This is just the Solidity file for the ParentNFT (Family Photo) contract and a quick ChildNFT test contract as well.
-2. See https://github.com/bnstrhbn/IPFS-NFT-EA/tree/master to pull down the Chainlink External Adapter code I'm using and deploy it on a node.
-3. See https://github.com/bnstrhbn/Family-Photo-Frontend to pull down a basic React frontend to interact with these contracts if you don't want to use Etherscan. 
+So now that we know NFTs can be used in different ways to enable musicians to interact with their communities - I think a really cool aspect of crypto's interoperability is the ability for projects to interact with one another, so some sort of FanLink NFT could be just a building block in a larger Music NFT ecosystem. 
+
+I also really like the idea of "vampire attacks" and was thinking about how music streaming is firmly dominated by Web2 - can we somehow vampire attack web2? OAuth seems like an open door to connect your web2 accounts securely to web3 and form that bridge into your web3 identity. 
+
+I do appreciate that this is not too appropriate for every type of data - you don't want to mint an NFT and store personal identification information onchain that would dox yourself. However, certain classes of data like artist fandom can't really be linked back to an individual on its own so I view this use-case as okay. In addition, many people like to flaunt their fandom of their favorite artists so being on-chain and public can be seen as a benefit.
+
+## What it does
+FanLink is a project with a couple components. First is the ERC-1155 structure of the FanLink tokens themselves. These are soulbound NFTs, meaning they can't be transferred between addresses and are meant to represent someone's fandom in their favorite artists. Someone would first sign-in to the frontend with their Spotify account - this allows the FE to get an OAuth access token and allow the FE to pull that person's favorite artists and mint those to an NFT. I also added an Update function to allow a fan to periodically add to their FanLink and add to their favorite artists - either by incrementing their old faves or adding new ones.
+
+The second part is a set of Chainlinked Artist tools as a separate contract and section in the FE. This is the artist interaction tools that allow them to see their on-chain fans and interact with them in various ways like reimbursing them in ETH for the price of their last concert or airdrop ETH for the ticket price of an upcoming concert. 
+
+## How we built it
+I have two Solidity Contracts - one for the artist tools that implements Chainlink Price Feeds for ETH/USD and VRFv1 for the lottery and one for the FanLink ERC-1155 where I overrode the transfer functions so these tokens can't be transferred.
+
+## Challenges we ran into
+Realistically a couple things need to be added. I was close but didnt finish minting through a Chainlink External Adapter. Right now, anyone can simulate the data array from the Spotify API call and mint to the Solidity contract. They can also mint from a single Spotify Account to multiple wallets. Using a Chainlink EA, you could encrypt the Access token that was posted to the EA call, then decrypt that and make the Spotify API call from the EA. You could also store linkages of Spotify account ID to NFT ID or something similar to ensure 1:1.
+
+I also didn't get a chance to implement VRFv2 which would have been fun but VRFv1 is a bit easier to use IMO.
+
+## Accomplishments that we're proud of
+I hadn't used "payable" contracts before! So I was happy to get my VRF-enabled payable functions to work. I also had a fun moment where I did an amusing "require 1==0" statement to disable all the transferring for my soulbound FanLink token. I also am pretty stoked about the idea of vampire attacking web2.
+
+## What we learned
+I feel like I learned a ton about ERC-1155, the fact that "Soulbound" isn't too much of a defined standard right now, and my frontend skills improved a lot. I hadn't actually used OAuth in practice to actually build anything before, despite troubleshooting a ton of it with developers in my day-job.
+
+## What's next for FanLink
+TBD - it would be excited to get the EA up and running.
+
 
 ## Requirements
 Overall - 
 1. I used VSCode, Brownie, and React. Install those. 
-1a. My Python code also heavily used Pillow, install that
 2. I also used Ganache-CLI for testing locally, install that.
-2a. To test the EA locally, you can use Docker, install that if you want.
 3. I deployed and did integrated testing on Kovan with a couple different accounts.
 
-External Adapter - 
-1. Infura key for Infura IPFS beta, I used Linkpool NaaS for my Kovan node, deployed my Python code as an AWS Lambda function
-2. Frontend - Alchemy key used in frontend
 
 ## Setting Up And Deploying The Solidity Contracts
 1. Open up VSCode and fill out your .env to set up your accounts on Kovan etc.
-1a. If deploying your own Chainlink node and External Adapter, change the Oracle address, jobID, and fee variables as appropriate.
 2. "brownie compile"
-3. "brownie run scripts/deploy.py --network=kovan" to run an overall deployment script to Kovan - this deploys the Family Photo ParentNFT.sol contract and a couple ChildNFT contracts to test with.
-3a. Remember to fund the ParentNFT contract with LINK!
+3. run in FanLinkNFT folder, to deploy FanLink.sol, run "brownie run scripts/deploy.py --network=kovan" to run an overall deployment script to Kovan.
+4. run in ArtistToolsSOL folder, to deploy ArtistTools.sol, run "brownie run scripts/deploy.py --network=kovan" to run an overall deployment script to Kovan.
+3a. Remember to fund the ArtistToolsSOL contract with LINK!
 4. Now interact via Etherscan or the frontend. You can Create a New FAM, Add NFTs to open FAMs, or Finalize FAMs. Then to see the Keeper/EA interaction, move an added NFT between wallets to see the regenerated image.
 
-## Setting Up And Deploying The External Adapter
-### Python
-1. I mostly followed these steps for deploying my Python code to Docker for local testing and AWS for the EA: https://github.com/thodges-gh/CL-EA-Python-Template
-2. To work with Docker, had to add Pillow as a requirement to the pipfile. 
-3. To work on AWS I followed the Lambda function instructions from the link above too. In addition, I added two Layers to my function. Pillow and requests from Klayers (https://github.com/keithrozario/Klayers)
-
-### Chainlink Node and External Adapter job
-1. I used Linkpool's Naas for this - it's on Kovan so can work with Keepers and easy to setup! So do that first.
-2. In order to process jobs, you need to deploy your Oracle smart contract and have it point at your node's address. This project uses "large responses" (https://docs.chain.link/docs/large-responses/) so you need to deploy the Operator.sol contract rather than the Oracle.sol - https://github.com/smartcontractkit/chainlink/blob/develop/contracts/src/v0.7/Operator.sol
-3. I created a new Bridge and new Job (JSON, not TOML :/) to call out to my Lambda function. See EAJob.txt in the EA git repository.
-
-## Setting up the Keeper Job
-1. Navigate to https://keepers.chain.link/kovan
-2. Register new Upkeep
-3. Set the fields - importantly, the Upkeep Address should be the address of your ParentNFT contract and the Gas limit should be max (2500000). Start it out with plenty of LINK.
-
 ## Setting up the Frontend
-1. Change contract address variables to point to your ParentNFT contract deployed on Kovan. Add your Alchemy Key to a .env file (used in index.tsx as config with @usedapp)
-2. You may need to regenerate the ABI jsons using: npx typechain --target ethers-v5 --out-dir src/abis/types './src/abis/*.json'
-3. "yarn start" to run this on localhost.
+1. Change contract address variables to point to your FanLink and ArtistTools contracts deployed on Kovan. Add your Alchemy Key to a .env file (used in index.tsx as config with @usedapp)
+2. You'll also need to sign up for a Spotify Dev account and make a new Spotify OAuth adapter with OAuth.io and get that key to plug into the configuration in the Frontend (in Header.js - or just use mine that i left in there).
+3. You may need to regenerate the ABI jsons using: npx typechain --target ethers-v5 --out-dir src/abis/types './src/abis/*.json'
+4. "yarn start" to run this on localhost.
+5. Connect with Spotify
